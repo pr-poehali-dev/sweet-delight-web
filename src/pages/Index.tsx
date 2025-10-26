@@ -4,7 +4,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
+
+interface CartItem {
+  productId: number;
+  quantity: number;
+}
 
 const products = [
   {
@@ -74,11 +83,87 @@ const reviews = [
 ];
 
 const Index = () => {
-  const [cart, setCart] = useState<number[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [orderForm, setOrderForm] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    date: '',
+    time: '',
+    comment: ''
+  });
+  const { toast } = useToast();
 
   const addToCart = (productId: number) => {
-    setCart([...cart, productId]);
+    const existingItem = cart.find(item => item.productId === productId);
+    if (existingItem) {
+      setCart(cart.map(item => 
+        item.productId === productId 
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      setCart([...cart, { productId, quantity: 1 }]);
+    }
+    toast({
+      title: 'Товар добавлен в корзину',
+      description: products.find(p => p.id === productId)?.name,
+    });
+  };
+
+  const removeFromCart = (productId: number) => {
+    setCart(cart.filter(item => item.productId !== productId));
+  };
+
+  const updateQuantity = (productId: number, quantity: number) => {
+    if (quantity === 0) {
+      removeFromCart(productId);
+    } else {
+      setCart(cart.map(item => 
+        item.productId === productId 
+          ? { ...item, quantity }
+          : item
+      ));
+    }
+  };
+
+  const getCartTotal = () => {
+    return cart.reduce((total, item) => {
+      const product = products.find(p => p.id === item.productId);
+      return total + (product?.price || 0) * item.quantity;
+    }, 0);
+  };
+
+  const getTotalItems = () => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  const handleCheckout = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const handleSubmitOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: 'Заказ оформлен!',
+      description: `Спасибо, ${orderForm.name}! Мы свяжемся с вами в ближайшее время.`,
+    });
+    setIsCheckoutOpen(false);
+    setCart([]);
+    setOrderForm({
+      name: '',
+      phone: '',
+      email: '',
+      address: '',
+      date: '',
+      time: '',
+      comment: ''
+    });
   };
 
   const heroSlides = [
@@ -119,14 +204,100 @@ const Index = () => {
                 <Icon name="Phone" size={20} />
                 <span className="font-medium">+7 999 123-45-67</span>
               </a>
-              <Button variant="outline" className="relative">
-                <Icon name="ShoppingCart" size={20} />
-                {cart.length > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                    {cart.length}
-                  </Badge>
-                )}
-              </Button>
+              <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="relative">
+                    <Icon name="ShoppingCart" size={20} />
+                    {getTotalItems() > 0 && (
+                      <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                        {getTotalItems()}
+                      </Badge>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:max-w-lg">
+                  <SheetHeader>
+                    <SheetTitle className="text-2xl">Корзина</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-8 flex flex-col h-full">
+                    {cart.length === 0 ? (
+                      <div className="flex-1 flex flex-col items-center justify-center text-center">
+                        <Icon name="ShoppingCart" size={64} className="text-muted-foreground mb-4" />
+                        <p className="text-lg text-muted-foreground">Корзина пуста</p>
+                        <p className="text-sm text-muted-foreground mt-2">Добавьте десерты из каталога</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex-1 overflow-auto space-y-4">
+                          {cart.map((item) => {
+                            const product = products.find(p => p.id === item.productId);
+                            if (!product) return null;
+                            return (
+                              <Card key={item.productId}>
+                                <CardContent className="p-4">
+                                  <div className="flex gap-4">
+                                    <img 
+                                      src={product.image} 
+                                      alt={product.name}
+                                      className="w-20 h-20 object-cover rounded-lg"
+                                    />
+                                    <div className="flex-1">
+                                      <h4 className="font-semibold mb-1">{product.name}</h4>
+                                      <p className="text-sm text-muted-foreground mb-2">{product.weight}</p>
+                                      <p className="font-bold text-primary">{product.price} ₽</p>
+                                    </div>
+                                    <div className="flex flex-col items-end justify-between">
+                                      <Button 
+                                        variant="ghost" 
+                                        size="icon"
+                                        onClick={() => removeFromCart(item.productId)}
+                                      >
+                                        <Icon name="Trash2" size={16} />
+                                      </Button>
+                                      <div className="flex items-center gap-2">
+                                        <Button 
+                                          variant="outline" 
+                                          size="icon"
+                                          className="h-8 w-8"
+                                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                                        >
+                                          <Icon name="Minus" size={14} />
+                                        </Button>
+                                        <span className="w-8 text-center font-medium">{item.quantity}</span>
+                                        <Button 
+                                          variant="outline" 
+                                          size="icon"
+                                          className="h-8 w-8"
+                                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                                        >
+                                          <Icon name="Plus" size={14} />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
+                        </div>
+                        <div className="border-t pt-4 mt-4 space-y-4">
+                          <div className="flex justify-between items-center text-lg">
+                            <span className="font-semibold">Итого:</span>
+                            <span className="font-bold text-2xl text-primary">{getCartTotal()} ₽</span>
+                          </div>
+                          <Button 
+                            onClick={handleCheckout}
+                            className="w-full bg-primary hover:bg-primary/90 text-foreground"
+                            size="lg"
+                          >
+                            Оформить заказ
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>
@@ -423,6 +594,131 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Оформление заказа</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmitOrder} className="space-y-6 mt-4">
+            <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+              <h3 className="font-semibold mb-3">Ваш заказ:</h3>
+              {cart.map((item) => {
+                const product = products.find(p => p.id === item.productId);
+                if (!product) return null;
+                return (
+                  <div key={item.productId} className="flex justify-between text-sm">
+                    <span>{product.name} × {item.quantity}</span>
+                    <span className="font-medium">{product.price * item.quantity} ₽</span>
+                  </div>
+                );
+              })}
+              <div className="border-t pt-2 mt-2 flex justify-between font-bold text-lg">
+                <span>Итого:</span>
+                <span className="text-primary">{getCartTotal()} ₽</span>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Имя *</Label>
+                  <Input
+                    id="name"
+                    required
+                    placeholder="Ваше имя"
+                    value={orderForm.name}
+                    onChange={(e) => setOrderForm({...orderForm, name: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Телефон *</Label>
+                  <Input
+                    id="phone"
+                    required
+                    type="tel"
+                    placeholder="+7 999 123-45-67"
+                    value={orderForm.phone}
+                    onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={orderForm.email}
+                  onChange={(e) => setOrderForm({...orderForm, email: e.target.value})}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="address">Адрес доставки *</Label>
+                <Input
+                  id="address"
+                  required
+                  placeholder="г. Москва, ул. Примерная, д. 1, кв. 10"
+                  value={orderForm.address}
+                  onChange={(e) => setOrderForm({...orderForm, address: e.target.value})}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="date">Дата доставки *</Label>
+                  <Input
+                    id="date"
+                    required
+                    type="date"
+                    value={orderForm.date}
+                    onChange={(e) => setOrderForm({...orderForm, date: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="time">Время доставки *</Label>
+                  <Input
+                    id="time"
+                    required
+                    type="time"
+                    value={orderForm.time}
+                    onChange={(e) => setOrderForm({...orderForm, time: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="comment">Комментарий к заказу</Label>
+                <Textarea
+                  id="comment"
+                  placeholder="Особые пожелания, надписи на торте и т.д."
+                  rows={3}
+                  value={orderForm.comment}
+                  onChange={(e) => setOrderForm({...orderForm, comment: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="bg-muted/30 rounded-lg p-4 flex items-start gap-3">
+              <Icon name="Info" size={20} className="text-primary mt-0.5" />
+              <div className="text-sm text-muted-foreground">
+                <p>После оформления заказа наш менеджер свяжется с вами для подтверждения.</p>
+                <p className="mt-1">Доставка осуществляется ежедневно с 9:00 до 21:00.</p>
+              </div>
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full bg-primary hover:bg-primary/90 text-foreground"
+              size="lg"
+            >
+              Подтвердить заказ
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
