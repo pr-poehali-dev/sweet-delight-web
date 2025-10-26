@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,8 +22,9 @@ const products = [
     category: 'Торты',
     price: 2500,
     image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/48d59a66-4ed3-4af8-b90a-57d775e8772d.jpg',
-    description: 'Нежный бисквит с клубничным кремом',
-    weight: '1 кг'
+    description: 'Нежный бисквит с клубничным кремом и свежей клубникой',
+    weight: '1 кг',
+    ingredients: 'Клубника, сливки, бисквит, сахар'
   },
   {
     id: 2,
@@ -31,8 +32,9 @@ const products = [
     category: 'Макаруны',
     price: 150,
     image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/9c5aa831-4a90-4ae5-81f9-4836eecff9c2.jpg',
-    description: 'Ассорти из 6 вкусов',
-    weight: '1 шт'
+    description: 'Воздушное миндальное печенье с кремовой начинкой',
+    weight: '1 шт',
+    ingredients: 'Миндальная мука, сливочный крем'
   },
   {
     id: 3,
@@ -40,8 +42,9 @@ const products = [
     category: 'Капкейки',
     price: 250,
     image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/21f8d061-ec01-4d6e-adad-01d40588de0e.jpg',
-    description: 'С кремовой начинкой и ягодами',
-    weight: '1 шт'
+    description: 'С кремовой начинкой и свежими ягодами',
+    weight: '1 шт',
+    ingredients: 'Шоколад, крем, ягоды, бисквит'
   },
   {
     id: 4,
@@ -49,16 +52,43 @@ const products = [
     category: 'Торты',
     price: 2200,
     image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/48d59a66-4ed3-4af8-b90a-57d775e8772d.jpg',
-    description: 'Классический рецепт',
-    weight: '1 кг'
+    description: 'Классический рецепт со сливочным кремом',
+    weight: '1 кг',
+    ingredients: 'Слоеное тесто, заварной крем, ваниль'
+  },
+  {
+    id: 5,
+    name: 'Пирожное "Картошка"',
+    category: 'Пирожные',
+    price: 120,
+    image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/21f8d061-ec01-4d6e-adad-01d40588de0e.jpg',
+    description: 'Классическое шоколадное пирожное',
+    weight: '100 г',
+    ingredients: 'Бисквитная крошка, какао, сгущенка'
+  },
+  {
+    id: 6,
+    name: 'Эклеры ассорти',
+    category: 'Пирожные',
+    price: 180,
+    image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/9c5aa831-4a90-4ae5-81f9-4836eecff9c2.jpg',
+    description: 'Заварные пирожные с разными начинками',
+    weight: '1 шт',
+    ingredients: 'Заварное тесто, крем, глазурь'
   }
 ];
 
 const categories = [
-  { name: 'Торты', icon: 'Cake', color: 'bg-pink-100' },
-  { name: 'Капкейки', icon: 'IceCream', color: 'bg-yellow-100' },
-  { name: 'Макаруны', icon: 'Cookie', color: 'bg-purple-100' },
-  { name: 'Пирожные', icon: 'Dessert', color: 'bg-orange-100' }
+  { name: 'Торты', icon: 'Cake', link: '#catalog' },
+  { name: 'Капкейки', icon: 'Coffee', link: '#catalog' },
+  { name: 'Макаруны', icon: 'Cookie', link: '#catalog' },
+  { name: 'Пирожные', icon: 'Dessert', link: '#catalog' },
+];
+
+const features = [
+  { step: '1', title: 'Выберите', description: 'Десерт из каталога', icon: 'Search' },
+  { step: '2', title: 'Закажите', description: 'Онлайн или по телефону', icon: 'ShoppingCart' },
+  { step: '3', title: 'Получите', description: 'Свежий десерт вовремя', icon: 'Gift' },
 ];
 
 const reviews = [
@@ -97,6 +127,31 @@ const Index = () => {
     comment: ''
   });
   const { toast } = useToast();
+
+  const heroSlides = [
+    {
+      title: 'Сладкие моменты вашей жизни',
+      subtitle: 'Ручная работа из премиальных ингредиентов. Без консервантов.',
+      image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=1920&h=800&fit=crop&q=80'
+    },
+    {
+      title: 'Французские макаруны',
+      subtitle: 'Изысканный вкус парижской кондитерской',
+      image: 'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=1920&h=800&fit=crop&q=80'
+    },
+    {
+      title: 'Капкейки на любой вкус',
+      subtitle: 'Идеальны для праздников и корпоративов',
+      image: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=1920&h=800&fit=crop&q=80'
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const addToCart = (productId: number) => {
     const existingItem = cart.find(item => item.productId === productId);
@@ -166,48 +221,30 @@ const Index = () => {
     });
   };
 
-  const heroSlides = [
-    {
-      title: 'Авторские десерты ручной работы',
-      subtitle: 'Создаём сладкие моменты из премиальных ингредиентов',
-      image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/48d59a66-4ed3-4af8-b90a-57d775e8772d.jpg'
-    },
-    {
-      title: 'Французские макаруны',
-      subtitle: 'Изысканный вкус парижской кондитерской',
-      image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/9c5aa831-4a90-4ae5-81f9-4836eecff9c2.jpg'
-    },
-    {
-      title: 'Капкейки на любой вкус',
-      subtitle: 'Идеальны для праздников и корпоративов',
-      image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/21f8d061-ec01-4d6e-adad-01d40588de0e.jpg'
-    }
-  ];
-
   return (
     <div className="min-h-screen">
-      <header className="fixed top-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="fixed top-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Icon name="Cake" size={32} className="text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">Sweet Delight</h1>
+              <Icon name="Cake" size={28} className="text-primary md:w-8 md:h-8" />
+              <h1 className="text-xl md:text-2xl font-bold text-foreground">Sweet Delight</h1>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <a href="#catalog" className="text-foreground hover:text-primary transition-colors">Каталог</a>
-              <a href="#about" className="text-foreground hover:text-primary transition-colors">О нас</a>
-              <a href="#reviews" className="text-foreground hover:text-primary transition-colors">Отзывы</a>
-              <a href="#contacts" className="text-foreground hover:text-primary transition-colors">Контакты</a>
+              <a href="#catalog" className="text-foreground hover:text-primary transition-colors font-medium">Каталог</a>
+              <a href="#about" className="text-foreground hover:text-primary transition-colors font-medium">О нас</a>
+              <a href="#reviews" className="text-foreground hover:text-primary transition-colors font-medium">Отзывы</a>
+              <a href="#contacts" className="text-foreground hover:text-primary transition-colors font-medium">Контакты</a>
             </nav>
-            <div className="flex items-center gap-4">
-              <a href="tel:+79991234567" className="hidden md:flex items-center gap-2 text-foreground">
+            <div className="flex items-center gap-2 md:gap-4">
+              <a href="tel:+79991234567" className="hidden lg:flex items-center gap-2 text-foreground hover:text-primary transition-colors">
                 <Icon name="Phone" size={20} />
                 <span className="font-medium">+7 999 123-45-67</span>
               </a>
               <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" className="relative">
-                    <Icon name="ShoppingCart" size={20} />
+                  <Button variant="outline" size="sm" className="relative">
+                    <Icon name="ShoppingCart" size={18} />
                     {getTotalItems() > 0 && (
                       <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
                         {getTotalItems()}
@@ -215,11 +252,11 @@ const Index = () => {
                     )}
                   </Button>
                 </SheetTrigger>
-                <SheetContent className="w-full sm:max-w-lg">
+                <SheetContent className="w-full sm:max-w-lg flex flex-col">
                   <SheetHeader>
                     <SheetTitle className="text-2xl">Корзина</SheetTitle>
                   </SheetHeader>
-                  <div className="mt-8 flex flex-col h-full">
+                  <div className="flex-1 flex flex-col mt-6">
                     {cart.length === 0 ? (
                       <div className="flex-1 flex flex-col items-center justify-center text-center">
                         <Icon name="ShoppingCart" size={64} className="text-muted-foreground mb-4" />
@@ -228,21 +265,21 @@ const Index = () => {
                       </div>
                     ) : (
                       <>
-                        <div className="flex-1 overflow-auto space-y-4">
+                        <div className="flex-1 overflow-auto space-y-4 pr-2">
                           {cart.map((item) => {
                             const product = products.find(p => p.id === item.productId);
                             if (!product) return null;
                             return (
-                              <Card key={item.productId}>
+                              <Card key={item.productId} className="border-border">
                                 <CardContent className="p-4">
                                   <div className="flex gap-4">
                                     <img 
                                       src={product.image} 
                                       alt={product.name}
-                                      className="w-20 h-20 object-cover rounded-lg"
+                                      className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                                     />
-                                    <div className="flex-1">
-                                      <h4 className="font-semibold mb-1">{product.name}</h4>
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="font-semibold mb-1 truncate">{product.name}</h4>
                                       <p className="text-sm text-muted-foreground mb-2">{product.weight}</p>
                                       <p className="font-bold text-primary">{product.price} ₽</p>
                                     </div>
@@ -250,6 +287,7 @@ const Index = () => {
                                       <Button 
                                         variant="ghost" 
                                         size="icon"
+                                        className="h-8 w-8"
                                         onClick={() => removeFromCart(item.productId)}
                                       >
                                         <Icon name="Trash2" size={16} />
@@ -258,16 +296,16 @@ const Index = () => {
                                         <Button 
                                           variant="outline" 
                                           size="icon"
-                                          className="h-8 w-8"
+                                          className="h-7 w-7"
                                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                                         >
                                           <Icon name="Minus" size={14} />
                                         </Button>
-                                        <span className="w-8 text-center font-medium">{item.quantity}</span>
+                                        <span className="w-6 text-center font-medium text-sm">{item.quantity}</span>
                                         <Button 
                                           variant="outline" 
                                           size="icon"
-                                          className="h-8 w-8"
+                                          className="h-7 w-7"
                                           onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                                         >
                                           <Icon name="Plus" size={14} />
@@ -280,14 +318,14 @@ const Index = () => {
                             );
                           })}
                         </div>
-                        <div className="border-t pt-4 mt-4 space-y-4">
-                          <div className="flex justify-between items-center text-lg">
-                            <span className="font-semibold">Итого:</span>
+                        <div className="border-t pt-4 mt-4 space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-lg">Итого:</span>
                             <span className="font-bold text-2xl text-primary">{getCartTotal()} ₽</span>
                           </div>
                           <Button 
                             onClick={handleCheckout}
-                            className="w-full bg-primary hover:bg-primary/90 text-foreground"
+                            className="w-full bg-primary hover:bg-primary/90 text-foreground font-semibold"
                             size="lg"
                           >
                             Оформить заказ
@@ -303,108 +341,136 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="pt-20">
-        <section className="relative h-[600px] overflow-hidden">
+      <main className="pt-16">
+        <section className="relative h-[500px] md:h-[700px] overflow-hidden">
           {heroSlides.map((slide, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-opacity duration-700 ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                currentSlide === index ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-background/95 to-background/50 z-10" />
               <img
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 z-20 flex items-center">
-                <div className="container mx-auto px-4">
-                  <div className="max-w-2xl animate-fade-in">
-                    <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-4">
-                      {slide.title}
-                    </h2>
-                    <p className="text-xl text-muted-foreground mb-8">
-                      {slide.subtitle}
-                    </p>
-                    <Button size="lg" className="bg-primary hover:bg-primary/90 text-foreground font-medium">
-                      Выбрать десерт
+              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-background" />
+              <div className="absolute inset-0 container mx-auto px-4 flex items-center">
+                <div className="max-w-3xl text-center md:text-left mx-auto md:mx-0">
+                  <h2 className="text-3xl md:text-7xl font-bold mb-3 md:mb-6 text-white drop-shadow-lg">
+                    {slide.title}
+                  </h2>
+                  <p className="text-base md:text-2xl mb-6 md:mb-8 text-white/95 drop-shadow">
+                    {slide.subtitle}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center md:justify-start">
+                    <Button 
+                      size="lg" 
+                      className="bg-primary hover:bg-primary/90 text-foreground font-semibold" 
+                      onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                      Смотреть каталог
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="bg-white/90 hover:bg-white border-0 text-foreground font-semibold" 
+                      onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                      О нас
                     </Button>
                   </div>
                 </div>
               </div>
             </div>
           ))}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+          <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
             {heroSlides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  index === currentSlide ? 'bg-primary w-8' : 'bg-white/50'
+                aria-label={`Слайд ${index + 1}`}
+                className={`h-2 rounded-full transition-all ${
+                  currentSlide === index ? 'bg-primary w-8' : 'bg-white/60 w-2'
                 }`}
               />
             ))}
           </div>
         </section>
 
-        <section className="py-16 bg-muted/30">
+        <section className="py-12 md:py-16 bg-background">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold text-center mb-12 animate-fade-in">
-              Популярные категории
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4">Популярные категории</h2>
+              <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto">
+                Выберите категорию десертов для особого момента
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {categories.map((category, index) => (
-                <Card
+                <a
                   key={category.name}
-                  className="hover-lift cursor-pointer animate-slide-up"
+                  href={category.link}
+                  className="group bg-card hover:bg-primary/10 rounded-2xl p-6 md:p-8 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border border-border"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <CardContent className="p-8 text-center">
-                    <div className={`${category.color} w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4`}>
-                      <Icon name={category.icon} size={32} className="text-foreground" />
-                    </div>
-                    <h3 className="font-semibold text-lg">{category.name}</h3>
-                  </CardContent>
-                </Card>
+                  <div className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/30 transition-colors">
+                    <Icon name={category.icon as any} size={28} className="text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-base md:text-lg">{category.name}</h3>
+                </a>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="catalog" className="py-16">
+        <section id="catalog" className="py-12 md:py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold text-center mb-4">Хиты продаж</h2>
-            <p className="text-center text-muted-foreground mb-12">Наши самые популярные десерты</p>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4">Хиты продаж</h2>
+              <p className="text-muted-foreground text-sm md:text-base">
+                Самые популярные десерты наших клиентов
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {products.map((product, index) => (
                 <Card
                   key={product.id}
-                  className="hover-lift overflow-hidden animate-fade-in"
+                  className="animate-slide-up hover-lift cursor-pointer bg-card border border-border overflow-hidden"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="aspect-square overflow-hidden">
+                  <div className="relative h-56 md:h-64 bg-muted/20 overflow-hidden group">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
+                    {index < 3 && (
+                      <Badge className="absolute top-3 right-3 bg-primary text-foreground font-semibold shadow-lg">
+                        Хит продаж
+                      </Badge>
+                    )}
                   </div>
-                  <CardContent className="p-6">
-                    <Badge variant="secondary" className="mb-2">{product.category}</Badge>
-                    <h3 className="font-bold text-xl mb-2">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{product.description}</p>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm text-muted-foreground">{product.weight}</span>
-                      <span className="text-2xl font-bold text-primary">{product.price} ₽</span>
+                  <CardContent className="p-4 md:p-6">
+                    <h3 className="text-lg md:text-xl font-bold mb-2">{product.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-3 md:mb-4 line-clamp-2">
+                      {product.description}
+                    </p>
+                    <div className="flex items-end justify-between gap-3">
+                      <div>
+                        <p className="text-xl md:text-2xl font-bold text-primary">{product.price} ₽</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">{product.weight}</p>
+                      </div>
+                      <Button
+                        onClick={() => addToCart(product.id)}
+                        size="sm"
+                        className="bg-primary hover:bg-primary/90 text-foreground font-semibold flex-shrink-0"
+                      >
+                        <Icon name="ShoppingCart" size={16} className="md:mr-2" />
+                        <span className="hidden md:inline">В корзину</span>
+                      </Button>
                     </div>
-                    <Button
-                      onClick={() => addToCart(product.id)}
-                      className="w-full bg-primary hover:bg-primary/90 text-foreground"
-                    >
-                      <Icon name="ShoppingCart" size={18} className="mr-2" />
-                      В корзину
-                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -412,54 +478,71 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="about" className="py-16 bg-muted/30">
+        <section id="about" className="py-12 md:py-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-4xl font-bold text-center mb-12">Как мы работаем</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl font-bold text-foreground">1</span>
-                  </div>
-                  <h3 className="font-bold text-xl mb-2">Выберите десерт</h3>
-                  <p className="text-muted-foreground">Из нашего каталога или создайте индивидуальный заказ</p>
+              <h2 className="text-3xl md:text-5xl font-bold text-center mb-6 md:mb-8">О нас</h2>
+              <p className="text-center text-muted-foreground mb-8 md:mb-12 text-sm md:text-lg max-w-2xl mx-auto">
+                Мы создаём авторские десерты из премиальных ингредиентов с 2015 года.
+                Каждый десерт — это ручная работа с любовью к деталям.
+              </p>
+              <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+                {features.map((feature, index) => (
+                  <Card
+                    key={feature.step}
+                    className="text-center p-6 md:p-8 hover:shadow-lg transition-shadow bg-card border-border"
+                    style={{ animationDelay: `${index * 0.15}s` }}
+                  >
+                    <div className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-4 bg-primary/20 rounded-full flex items-center justify-center">
+                      <Icon name={feature.icon as any} size={28} className="text-primary" />
+                    </div>
+                    <div className="text-3xl md:text-4xl font-bold text-primary mb-3">{feature.step}</div>
+                    <h3 className="font-bold text-lg md:text-xl mb-2">{feature.title}</h3>
+                    <p className="text-sm md:text-base text-muted-foreground">{feature.description}</p>
+                  </Card>
+                ))}
+              </div>
+              <div className="mt-12 md:mt-16 grid md:grid-cols-3 gap-6 md:gap-8 text-center">
+                <div className="p-6">
+                  <Icon name="Award" size={32} className="mx-auto mb-3 text-primary" />
+                  <h4 className="font-bold text-base md:text-lg mb-2">Премиальные ингредиенты</h4>
+                  <p className="text-sm text-muted-foreground">Только лучшее сырье от проверенных поставщиков</p>
                 </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl font-bold text-foreground">2</span>
-                  </div>
-                  <h3 className="font-bold text-xl mb-2">Оформите заказ</h3>
-                  <p className="text-muted-foreground">Через сайт, по телефону или в соцсетях</p>
+                <div className="p-6">
+                  <Icon name="Heart" size={32} className="mx-auto mb-3 text-primary" />
+                  <h4 className="font-bold text-base md:text-lg mb-2">Без консервантов</h4>
+                  <p className="text-sm text-muted-foreground">100% натуральные продукты и свежесть</p>
                 </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl font-bold text-foreground">3</span>
-                  </div>
-                  <h3 className="font-bold text-xl mb-2">Получите свежий десерт</h3>
-                  <p className="text-muted-foreground">Доставка в день заказа или самовывоз</p>
+                <div className="p-6">
+                  <Icon name="Users" size={32} className="mx-auto mb-3 text-primary" />
+                  <h4 className="font-bold text-base md:text-lg mb-2">Опытные кондитеры</h4>
+                  <p className="text-sm text-muted-foreground">Команда мастеров своего дела</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="reviews" className="py-16">
+        <section id="reviews" className="py-12 md:py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold text-center mb-12">Отзывы наших клиентов</h2>
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold text-center mb-4">Отзывы</h2>
+            <p className="text-center text-muted-foreground mb-8 md:mb-12 text-sm md:text-base">
+              Что говорят наши клиенты
+            </p>
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
               {reviews.map((review, index) => (
                 <Card
                   key={review.id}
-                  className="animate-slide-up"
+                  className="animate-slide-up bg-card border-border"
                   style={{ animationDelay: `${index * 0.15}s` }}
                 >
                   <CardContent className="p-6">
                     <div className="flex gap-1 mb-4">
                       {[...Array(review.rating)].map((_, i) => (
-                        <Icon key={i} name="Star" size={20} className="text-yellow-400 fill-yellow-400" />
+                        <Icon key={i} name="Star" size={18} className="text-yellow-400 fill-yellow-400" />
                       ))}
                     </div>
-                    <p className="text-muted-foreground mb-4 italic">"{review.text}"</p>
+                    <p className="text-muted-foreground mb-4 italic text-sm md:text-base">"{review.text}"</p>
                     <p className="font-semibold">{review.name}</p>
                   </CardContent>
                 </Card>
@@ -468,89 +551,71 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="contacts" className="py-16 bg-muted/30">
+        <section id="contacts" className="py-12 md:py-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-4xl font-bold text-center mb-4">Свяжитесь с нами</h2>
-              <p className="text-center text-muted-foreground mb-12">
+              <h2 className="text-3xl md:text-5xl font-bold text-center mb-4">Свяжитесь с нами</h2>
+              <p className="text-center text-muted-foreground mb-8 md:mb-12 text-sm md:text-base">
                 Остались вопросы? Мы с радостью на них ответим!
               </p>
-              <div className="grid md:grid-cols-2 gap-12">
+              <div className="grid md:grid-cols-2 gap-8 md:gap-12">
                 <div>
-                  <h3 className="font-bold text-xl mb-6">Контактная информация</h3>
+                  <h3 className="font-bold text-lg md:text-xl mb-6">Контактная информация</h3>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
-                      <Icon name="MapPin" size={24} className="text-primary mt-1" />
+                      <Icon name="MapPin" size={24} className="text-primary mt-1 flex-shrink-0" />
                       <div>
                         <p className="font-medium">Адрес</p>
-                        <p className="text-muted-foreground">г. Москва, ул. Кондитерская, д. 10</p>
+                        <p className="text-muted-foreground text-sm md:text-base">г. Москва, ул. Кондитерская, д. 10</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <Icon name="Phone" size={24} className="text-primary mt-1" />
+                      <Icon name="Phone" size={24} className="text-primary mt-1 flex-shrink-0" />
                       <div>
                         <p className="font-medium">Телефон</p>
-                        <p className="text-muted-foreground">+7 999 123-45-67</p>
+                        <a href="tel:+79991234567" className="text-muted-foreground hover:text-primary transition-colors text-sm md:text-base">
+                          +7 999 123-45-67
+                        </a>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <Icon name="Mail" size={24} className="text-primary mt-1" />
+                      <Icon name="Mail" size={24} className="text-primary mt-1 flex-shrink-0" />
                       <div>
                         <p className="font-medium">Email</p>
-                        <p className="text-muted-foreground">info@sweetdelight.ru</p>
+                        <a href="mailto:info@sweetdelight.ru" className="text-muted-foreground hover:text-primary transition-colors text-sm md:text-base">
+                          info@sweetdelight.ru
+                        </a>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <Icon name="Clock" size={24} className="text-primary mt-1" />
+                      <Icon name="Clock" size={24} className="text-primary mt-1 flex-shrink-0" />
                       <div>
                         <p className="font-medium">Режим работы</p>
-                        <p className="text-muted-foreground">Ежедневно с 9:00 до 21:00</p>
+                        <p className="text-muted-foreground text-sm md:text-base">Ежедневно с 9:00 до 21:00</p>
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-4 mt-8">
-                    <Button variant="outline" size="icon" className="rounded-full">
-                      <Icon name="Instagram" size={20} />
-                    </Button>
-                    <Button variant="outline" size="icon" className="rounded-full">
-                      <Icon name="Facebook" size={20} />
-                    </Button>
-                    <Button variant="outline" size="icon" className="rounded-full">
-                      <Icon name="MessageCircle" size={20} />
-                    </Button>
-                  </div>
                 </div>
-                <Card>
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-xl mb-4">Форма обратной связи</h3>
-                    <form className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Имя</label>
-                        <Input placeholder="Ваше имя" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Телефон</label>
-                        <Input placeholder="+7 999 123-45-67" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Сообщение</label>
-                        <Textarea placeholder="Ваш вопрос или комментарий" rows={4} />
-                      </div>
-                      <Button className="w-full bg-primary hover:bg-primary/90 text-foreground">
-                        Отправить
-                      </Button>
-                    </form>
-                  </CardContent>
-                </Card>
+                <div>
+                  <h3 className="font-bold text-lg md:text-xl mb-6">Напишите нам</h3>
+                  <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); toast({ title: 'Сообщение отправлено!', description: 'Мы свяжемся с вами в ближайшее время.' }); }}>
+                    <Input placeholder="Ваше имя" required />
+                    <Input type="tel" placeholder="Телефон" required />
+                    <Textarea placeholder="Ваше сообщение" rows={4} required />
+                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-foreground font-semibold">
+                      Отправить
+                    </Button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="bg-foreground text-background py-12">
+      <footer className="bg-foreground text-background py-8 md:py-12">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Icon name="Cake" size={28} className="text-primary" />
@@ -561,29 +626,20 @@ const Index = () => {
               </p>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Меню</h4>
-              <ul className="space-y-2 text-sm opacity-80">
-                <li><a href="#catalog" className="hover:text-primary transition-colors">Каталог</a></li>
-                <li><a href="#about" className="hover:text-primary transition-colors">О нас</a></li>
-                <li><a href="#reviews" className="hover:text-primary transition-colors">Отзывы</a></li>
-                <li><a href="#contacts" className="hover:text-primary transition-colors">Контакты</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Информация</h4>
-              <ul className="space-y-2 text-sm opacity-80">
-                <li>Доставка и оплата</li>
-                <li>Программа лояльности</li>
-                <li>Акции</li>
-                <li>Вакансии</li>
-              </ul>
+              <h4 className="font-bold mb-4">Навигация</h4>
+              <nav className="space-y-2 text-sm">
+                <a href="#catalog" className="block opacity-80 hover:opacity-100 transition-opacity">Каталог</a>
+                <a href="#about" className="block opacity-80 hover:opacity-100 transition-opacity">О нас</a>
+                <a href="#reviews" className="block opacity-80 hover:opacity-100 transition-opacity">Отзывы</a>
+                <a href="#contacts" className="block opacity-80 hover:opacity-100 transition-opacity">Контакты</a>
+              </nav>
             </div>
             <div>
               <h4 className="font-bold mb-4">Подписка</h4>
               <p className="text-sm opacity-80 mb-4">Узнавайте о новинках и акциях первыми</p>
               <div className="flex gap-2">
                 <Input placeholder="Ваш email" className="bg-background text-foreground" />
-                <Button className="bg-primary hover:bg-primary/90 text-foreground">
+                <Button className="bg-primary hover:bg-primary/90 text-foreground flex-shrink-0">
                   <Icon name="Send" size={18} />
                 </Button>
               </div>
@@ -702,7 +758,7 @@ const Index = () => {
             </div>
 
             <div className="bg-muted/30 rounded-lg p-4 flex items-start gap-3">
-              <Icon name="Info" size={20} className="text-primary mt-0.5" />
+              <Icon name="Info" size={20} className="text-primary mt-0.5 flex-shrink-0" />
               <div className="text-sm text-muted-foreground">
                 <p>После оформления заказа наш менеджер свяжется с вами для подтверждения.</p>
                 <p className="mt-1">Доставка осуществляется ежедневно с 9:00 до 21:00.</p>
@@ -711,7 +767,7 @@ const Index = () => {
 
             <Button 
               type="submit" 
-              className="w-full bg-primary hover:bg-primary/90 text-foreground"
+              className="w-full bg-primary hover:bg-primary/90 text-foreground font-semibold"
               size="lg"
             >
               Подтвердить заказ
