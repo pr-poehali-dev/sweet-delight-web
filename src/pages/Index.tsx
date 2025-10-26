@@ -142,7 +142,7 @@ const Index = () => {
     {
       title: 'Капкейки на любой вкус',
       subtitle: 'Идеальны для праздников и корпоративов',
-      image: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=1920&h=800&fit=crop&q=80'
+      image: 'https://cdn.poehali.dev/projects/a056d120-8143-4f3a-b98b-347aba4afe8e/files/21f8d061-ec01-4d6e-adad-01d40588de0e.jpg'
     }
   ];
 
